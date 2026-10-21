@@ -4,17 +4,10 @@
 **Student Number:** 402307064  
 **Module:** Mobile App Development 700  
 
-Java Android application that suggests recipes based strictly on leftover ingredients to cut food waste.
+Java Android application that suggests recipes based strictly on leftover ingredients to reduce food waste.
 
-## Database
-SQLite (local) using SQLiteOpenHelper + DataSource pattern.
-
-## Theme
-Professional blue colour scheme.
+## Active development branch
+`feature/day1-sqlite` — SQLite database layer, models, blue theme
 
 ## Package
 `com.kashi402307064.smartpantrymanager`
-
-## Branches
-- `main` - stable
-- `feature/sqlite-database` - SQLite layer + models + blue theme
