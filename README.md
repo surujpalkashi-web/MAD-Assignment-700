@@ -1,19 +1,20 @@
 # Smart Pantry Manager - MAD 700 Assignment
 
+**Student:** Kashi Surujpal  
+**Student Number:** 402307064  
+**Module:** Mobile App Development 700  
+
 Java Android application that suggests recipes based strictly on leftover ingredients to cut food waste.
 
 ## Database
-SQLite (local) using SQLiteOpenHelper + DataSource pattern (as taught in the module).
+SQLite (local) using SQLiteOpenHelper + DataSource pattern.
 
 ## Theme
 Professional blue colour scheme.
 
-## Structure
-- `db/` - DatabaseHelper and PantryDataSource
-- `model/` - PantryItem, Recipe, RecipeIngredient, CalorieEntry
-- Activities for pantry CRUD, suggested recipes, recipe detail, settings, and calorie tracker
+## Package
+`com.kashi402307064.smartpantrymanager`
 
-## Setup
-1. Open in Android Studio
-2. Sync Gradle
-3. Run on emulator or device (minSdk 24)
+## Branches
+- `main` - stable
+- `feature/sqlite-database` - SQLite layer + models + blue theme
