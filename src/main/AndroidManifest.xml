@@ -17,6 +17,16 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".AddEditPantryActivity"
+            android:parentActivityName=".MainActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".CalorieTrackerActivity"
+            android:parentActivityName=".MainActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>
