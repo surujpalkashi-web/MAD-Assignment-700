@@ -8,6 +8,8 @@ public class Recipe {
     private String name;
     private List<RecipeIngredient> ingredients = new ArrayList<>();
     private List<String> steps = new ArrayList<>();
+    /** Optional: used only for Almost There list display. */
+    private String missingSummary;
 
     public Recipe() {
     }
@@ -48,5 +50,13 @@ public class Recipe {
 
     public void setSteps(List<String> steps) {
         this.steps = steps;
+    }
+
+    public String getMissingSummary() {
+        return missingSummary;
+    }
+
+    public void setMissingSummary(String missingSummary) {
+        this.missingSummary = missingSummary;
     }
 }
