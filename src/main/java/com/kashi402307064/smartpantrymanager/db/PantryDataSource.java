@@ -66,6 +66,22 @@ public class PantryDataSource {
                 DatabaseHelper.COL_P_ID + "=?", new String[]{String.valueOf(id)}) > 0;
     }
 
+    public void clearPantry() {
+        database.delete(DatabaseHelper.TABLE_PANTRY, null, null);
+    }
+
+    public PantryItem getPantryItemById(long id) {
+        Cursor cursor = database.query(DatabaseHelper.TABLE_PANTRY, null,
+                DatabaseHelper.COL_P_ID + "=?", new String[]{String.valueOf(id)},
+                null, null, null);
+        PantryItem item = null;
+        if (cursor.moveToFirst()) {
+            item = cursorToPantry(cursor);
+        }
+        cursor.close();
+        return item;
+    }
+
     public List<PantryItem> getAllPantryItems() {
         List<PantryItem> list = new ArrayList<>();
         Cursor cursor = database.query(DatabaseHelper.TABLE_PANTRY, null, null, null, null, null,

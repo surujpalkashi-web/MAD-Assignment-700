@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.kashi402307064.smartpantrymanager.adapter.PantryAdapter;
 import com.kashi402307064.smartpantrymanager.db.PantryDataSource;
@@ -18,12 +19,15 @@ import com.kashi402307064.smartpantrymanager.model.PantryItem;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements PantryAdapter.OnPantryActionListener {
+/**
+ * Home screen: pantry list with add/edit/delete and bottom navigation.
+ */
+public class MainActivity extends AppCompatActivity {
 
     private PantryDataSource dataSource;
     private PantryAdapter adapter;
     private TextView tvEmpty;
-    private RecyclerView recyclerView;
+    private RecyclerView recyclerPantry;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,67 +35,89 @@ public class MainActivity extends AppCompatActivity implements PantryAdapter.OnP
         setContentView(R.layout.activity_main);
 
         dataSource = new PantryDataSource(this);
+        dataSource.open();
 
-        recyclerView = findViewById(R.id.recyclerPantry);
+        new RecipeSeeder(dataSource).seedIfNeeded();
+
+        recyclerPantry = findViewById(R.id.recyclerPantry);
         tvEmpty = findViewById(R.id.tvEmpty);
         FloatingActionButton fabAdd = findViewById(R.id.fabAdd);
-        View btnCalories = findViewById(R.id.btnCalories);
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
 
-        adapter = new PantryAdapter(this);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(adapter);
+        adapter = new PantryAdapter(new PantryAdapter.Listener() {
+            @Override
+            public void onEdit(PantryItem item) {
+                Intent intent = new Intent(MainActivity.this, AddEditPantryActivity.class);
+                intent.putExtra(AddEditPantryActivity.EXTRA_ITEM_ID, item.getId());
+                startActivity(intent);
+            }
+
+            @Override
+            public void onDelete(PantryItem item) {
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("Delete item")
+                        .setMessage("Remove " + item.getName() + " from your pantry?")
+                        .setPositiveButton("Delete", (d, w) -> {
+                            dataSource.deletePantryItem(item.getId());
+                            loadPantry();
+                            Toast.makeText(MainActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+            }
+        });
+
+        recyclerPantry.setLayoutManager(new LinearLayoutManager(this));
+        recyclerPantry.setAdapter(adapter);
 
         fabAdd.setOnClickListener(v ->
-                startActivity(new Intent(this, AddEditPantryActivity.class)));
+                startActivity(new Intent(MainActivity.this, AddEditPantryActivity.class)));
 
-        btnCalories.setOnClickListener(v ->
-                startActivity(new Intent(this, CalorieTrackerActivity.class)));
+        bottomNav.setSelectedItemId(R.id.nav_pantry);
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_pantry) {
+                return true;
+            } else if (id == R.id.nav_suggested) {
+                startActivity(new Intent(this, SuggestedRecipesActivity.class));
+                return true;
+            } else if (id == R.id.nav_calories) {
+                startActivity(new Intent(this, CalorieTrackerActivity.class));
+                return true;
+            } else if (id == R.id.nav_settings) {
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+            }
+            return false;
+        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        dataSource.open();
-        refreshList();
-    }
-
-    @Override
-    protected void onPause() {
-        dataSource.close();
-        super.onPause();
-    }
-
-    private void refreshList() {
-        List<PantryItem> items = dataSource.getAllPantryItems();
-        adapter.setItems(items);
-        if (items.isEmpty()) {
-            tvEmpty.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.GONE);
-        } else {
-            tvEmpty.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE);
+        if (dataSource != null) {
+            dataSource.open();
+            loadPantry();
+        }
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
+        if (bottomNav != null) {
+            bottomNav.setSelectedItemId(R.id.nav_pantry);
         }
     }
 
-    @Override
-    public void onEdit(PantryItem item) {
-        Intent intent = new Intent(this, AddEditPantryActivity.class);
-        intent.putExtra(AddEditPantryActivity.EXTRA_ITEM_ID, item.getId());
-        startActivity(intent);
+    private void loadPantry() {
+        List<PantryItem> items = dataSource.getAllPantryItems();
+        adapter.setItems(items);
+        boolean empty = items == null || items.isEmpty();
+        tvEmpty.setVisibility(empty ? View.VISIBLE : View.GONE);
+        recyclerPantry.setVisibility(empty ? View.GONE : View.VISIBLE);
     }
 
     @Override
-    public void onDelete(PantryItem item) {
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.delete)
-                .setMessage(getString(R.string.confirm_delete, item.getName()))
-                .setPositiveButton(R.string.delete, (d, w) -> {
-                    dataSource.open();
-                    dataSource.deletePantryItem(item.getId());
-                    refreshList();
-                    Toast.makeText(this, R.string.item_deleted, Toast.LENGTH_SHORT).show();
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .show();
+    protected void onDestroy() {
+        if (dataSource != null) {
+            dataSource.close();
+        }
+        super.onDestroy();
     }
 }

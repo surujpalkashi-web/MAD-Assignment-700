@@ -19,13 +19,28 @@
 
         <activity
             android:name=".AddEditPantryActivity"
-            android:parentActivityName=".MainActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".SuggestedRecipesActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".RecipeDetailActivity"
+            android:exported="false"
+            android:parentActivityName=".SuggestedRecipesActivity" />
 
         <activity
             android:name=".CalorieTrackerActivity"
-            android:parentActivityName=".MainActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
 
     </application>
 
